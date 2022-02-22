@@ -56,8 +56,6 @@ The YANG data model defined in this document conforms to the Network Management 
 
 ## Terminology and Notations 
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 {{!RFC2119}}, {{!RFC8174}} when, and only when, they appear in all capitals, as shown here.
-
 This document assumes that the reader is familiar with the contents of {{!RFC7276}}, {{!RFC8531}}, {{!RFC8532}}, and {{!RFC8533}}. The document uses terms from those documents.
 
 The terminology for describing YANG data models is found in {{!RFC7950}}.
@@ -71,6 +69,10 @@ The terminology for describing YANG data models is found in {{!RFC7950}}.
   OAM test-sequence:
 
   > a holder of the device and provides power supply for the device in it.
+
+## Requirements Language
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in {{!BCP14}}, {{!RFC2119}}, {{!RFC8174}} when, and only when, they appear in all capitals, as shown here.
 
 ## Tree Diagram
 
