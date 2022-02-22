@@ -1,0 +1,336 @@
+
+
+
+
+OPSAWG Working Group                                     L. M. Contreras
+Internet-Draft                                                Telefonica
+Intended status: Standards Track                                V. Lopez
+Expires: 26 August 2022                                            Nokia
+                                                        22 February 2022
+
+
+A YANG Data Model for the Management of Operations, Administration, and
+                        Maintenance (OAM) Tests
+                draft-contreras-opsawg-oam-tests-yang-00
+
+Abstract
+
+   This document defines a YANG data model for representing the view of
+   Operations, Administration, and Maintenance (OAM) tests that are part
+   of a Service Provider network.  The data model augments ietf-network
+   model by adding the concept of oam-test.  The OAM Test concept is a
+   OAM test instance with its life cycle, which relies on OAM node
+   models.
+
+   The YANG data model defined in this document conforms to the Network
+   Management Datastore Architecture (NMDA).
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 26 August 2022.
+
+Copyright Notice
+
+   Copyright (c) 2022 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+
+
+
+Contreras & Lopez        Expires 26 August 2022                 [Page 1]
+
+Internet-Draft               OAM Tests YANG                February 2022
+
+
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+     1.1.  Terminology and Notations . . . . . . . . . . . . . . . .   3
+     1.2.  Tree Diagram  . . . . . . . . . . . . . . . . . . . . . .   4
+     1.3.  Prefix in Data Node Names . . . . . . . . . . . . . . . .   4
+   2.  YANG Data Model for OAM Tests . . . . . . . . . . . . . . . .   4
+     2.1.  YANG Model Overview . . . . . . . . . . . . . . . . . . .   4
+   3.  OAM Tests Tree Diagram  . . . . . . . . . . . . . . . . . . .   4
+   4.  YANG Model for OAM Tests  . . . . . . . . . . . . . . . . . .   4
+   5.  Manageability Considerations  . . . . . . . . . . . . . . . .   5
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .   5
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   5
+   8.  Normative References  . . . . . . . . . . . . . . . . . . . .   5
+   Acknowledgments . . . . . . . . . . . . . . . . . . . . . . . . .   6
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   6
+
+1.  Introduction
+
+   Operations, Administration, and Maintenance (OAM) tasks are
+   fundamental functionalities of the network management.  Given the
+   emerging of data models and their utilization in Service Provider's
+   management, the management of OAM tests has also to be defined as a
+   data model.
+
+   Network operator can use OAM tests for the following use cases: *
+   One-time on-demand validation tasks.  For example, after a service is
+   created, the network operator can create a birth certificate
+   obtaining network parameters (latency, losses or bandwidth) +
+   Proactive supervision tasks in the network.  The network operators
+   can perform continuous monitoring activities to detect, for example,
+   SLA violations on an existing service. + Troubleshooting.  After the
+   detection of a problem in the network, OAM tests are performed to
+   find the root cause for the detected issue. - Network Optimization.
+   Delay and loss metrics are monitored in the network to perform
+   automated traffic optimization actions like LSP rerouting.
+
+   [RFC7276] presents an overview of OAM tools, summarizes some of the
+   tools for performance monitoring and detecting network failures.
+   [RFC8531] defines a technology-independent YANG model including the
+   key OAM information for the connection-oriented protocols.  It uses
+   the concepts of the CFM model as a basis, but it enables the
+
+
+
+Contreras & Lopez        Expires 26 August 2022                 [Page 2]
+
+Internet-Draft               OAM Tests YANG                February 2022
+
+
+   adaptation to other connection-oriented OAM protocols.  Similarly,
+   [RFC8532] works in a a technology-independent YANG model, but for the
+   connectionless protocols.  [RFC8533] defines presents an on-demand
+   retrieval method YANG data model for conectionless OAM protocols.
+
+   For the use cases presented in this section,
+
+   An OAM test is an execution of a test that an operator want to do in
+   its network.  The OAM test as itself has a life cycle, inputs and
+   outputs.  There are two major OAM modes: on-demand and periodic.
+   "On-demand" tests are executed once after they are configured in the
+   node.  On the other hand, "periodic" tests are those that are
+   configured once, but they are executed several times.  An OAM test
+   executed in two different moments will provide different outcomes.
+
+   An OAM test-sequence is a set of OAM contains a set of OAM tests
+   which are executed in parallel or sequential stages providing test
+   grouping mechanisms.  An OAM test-sequence will have aggregate
+   results, providing a summary of the test results associated with this
+   OAM test-sequence.
+
+   The YANG data model defined in this document conforms to the Network
+   Management Datastore Architecture [RFC8342].
+
+1.1.  Terminology and Notations
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119], [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This document assumes that the reader is familiar with the contents
+   of [RFC7276], [RFC8531], [RFC8532], and [RFC8533].  The document uses
+   terms from those documents.
+
+   The terminology for describing YANG data models is found in
+   [RFC7950].
+
+   Following terms are used for the representation of this data model.
+
+   OAM test:
+
+      a device installed on one or several shelves and can afford some
+      specific transmission function independently.
+
+   OAM test-sequence:
+
+
+
+
+Contreras & Lopez        Expires 26 August 2022                 [Page 3]
+
+Internet-Draft               OAM Tests YANG                February 2022
+
+
+      a holder of the device and provides power supply for the device in
+      it.
+
+1.2.  Tree Diagram
+
+   Authors include a simplified graphical representation of the data
+   model is used in Section 3 of this document.  The meaning of the
+   symbols in these diagrams is defined in [RFC8340].
+
+1.3.  Prefix in Data Node Names
+
+   In this document, names of data nodes and other data model objects
+   are prefixed using the standard prefix associated with the
+   corresponding YANG imported modules, as shown in the following table.
+
+                 +========+=================+===========+
+                 | Prefix | Yang Module     | Reference |
+                 +========+=================+===========+
+                 | oamt   | ietf-oam-tests  | RFCXXX    |
+                 +--------+-----------------+-----------+
+                 | yang   | ietf-yang-types | [RFC6991] |
+                 +--------+-----------------+-----------+
+
+                   Table 1: Prefixes and corresponding
+                               YANG modules
+
+   RFC Editor Note: Please replace XXXX with the RFC number assigned to
+   this document.  Please remove this note.
+
+2.  YANG Data Model for OAM Tests
+
+2.1.  YANG Model Overview
+
+3.  OAM Tests Tree Diagram
+
+   Figure 1 below shows the tree diagram of the YANG data model defined
+   in module ietf-oam-tests.yang (Section 4).
+
+   (Artwork only available as (unknown type): No external link
+   available, see draft-contreras-opsawg-oam-tests-yang-00.html for
+   artwork.)
+
+                      Figure 1: OAM Tests tree diagram
+
+4.  YANG Model for OAM Tests
+
+
+
+
+
+
+Contreras & Lopez        Expires 26 August 2022                 [Page 4]
+
+Internet-Draft               OAM Tests YANG                February 2022
+
+
+   <CODE BEGINS> file "ietf-oam-tests@2022-03-07.yang"
+   (Artwork only available as (unknown type): No external link
+   available, see draft-contreras-opsawg-oam-tests-yang-00.html for
+   artwork.)
+   <CODE ENDS>
+
+                      Figure 2: OAM Tests YANG module
+
+5.  Manageability Considerations
+
+   <Add any manageability considerations>
+
+6.  Security Considerations
+
+   <Add any security considerations>
+
+7.  IANA Considerations
+
+   <Add any IANA considerations>
+
+8.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+   [RFC6991]  Schoenwaelder, J., Ed., "Common YANG Data Types",
+              RFC 6991, DOI 10.17487/RFC6991, July 2013,
+              <https://www.rfc-editor.org/info/rfc6991>.
+
+   [RFC7276]  Mizrahi, T., Sprecher, N., Bellagamba, E., and Y.
+              Weingarten, "An Overview of Operations, Administration,
+              and Maintenance (OAM) Tools", RFC 7276,
+              DOI 10.17487/RFC7276, June 2014,
+              <https://www.rfc-editor.org/info/rfc7276>.
+
+   [RFC7950]  Bjorklund, M., Ed., "The YANG 1.1 Data Modeling Language",
+              RFC 7950, DOI 10.17487/RFC7950, August 2016,
+              <https://www.rfc-editor.org/info/rfc7950>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC8340]  Bjorklund, M. and L. Berger, Ed., "YANG Tree Diagrams",
+              BCP 215, RFC 8340, DOI 10.17487/RFC8340, March 2018,
+              <https://www.rfc-editor.org/info/rfc8340>.
+
+
+
+Contreras & Lopez        Expires 26 August 2022                 [Page 5]
+
+Internet-Draft               OAM Tests YANG                February 2022
+
+
+   [RFC8342]  Bjorklund, M., Schoenwaelder, J., Shafer, P., Watsen, K.,
+              and R. Wilton, "Network Management Datastore Architecture
+              (NMDA)", RFC 8342, DOI 10.17487/RFC8342, March 2018,
+              <https://www.rfc-editor.org/info/rfc8342>.
+
+   [RFC8531]  Kumar, D., Wu, Q., and Z. Wang, "Generic YANG Data Model
+              for Connection-Oriented Operations, Administration, and
+              Maintenance (OAM) Protocols", RFC 8531,
+              DOI 10.17487/RFC8531, April 2019,
+              <https://www.rfc-editor.org/info/rfc8531>.
+
+   [RFC8532]  Kumar, D., Wang, Z., Wu, Q., Ed., Rahman, R., and S.
+              Raghavan, "Generic YANG Data Model for the Management of
+              Operations, Administration, and Maintenance (OAM)
+              Protocols That Use Connectionless Communications",
+              RFC 8532, DOI 10.17487/RFC8532, April 2019,
+              <https://www.rfc-editor.org/info/rfc8532>.
+
+   [RFC8533]  Kumar, D., Wang, M., Wu, Q., Ed., Rahman, R., and S.
+              Raghavan, "A YANG Data Model for Retrieval Methods for the
+              Management of Operations, Administration, and Maintenance
+              (OAM) Protocols That Use Connectionless Communications",
+              RFC 8533, DOI 10.17487/RFC8533, April 2019,
+              <https://www.rfc-editor.org/info/rfc8533>.
+
+Acknowledgments
+
+   The authors of this document would like to thank XXX.
+
+   This document was prepared using kramdown.
+
+Authors' Addresses
+
+   Luis Miguel Contreras
+   Telefonica
+   Email: luismiguel.contrerasmurillo@telefonica.com
+
+
+   Victor Lopez
+   Nokia
+   Email: victor.lopez@nokia.com
+
+
+
+
+
+
+
+
+
+
+Contreras & Lopez        Expires 26 August 2022                 [Page 6]
